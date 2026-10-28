@@ -363,6 +363,11 @@ TEST_F(CLASSNAME(TestPublisherFixture, RMW_IMPLEMENTATION), test_publisher_loan)
         &publisher,
         ts,
         reinterpret_cast<void **>(msg_loaned_ptr)));
+    // (CWE-476): Null Dereference
+    // Because the pointer(msg_loaned) is accessed without prior null verification,
+    // which could cause the process to terminate abnormally,
+    // fix to check null vertification and force to terminate as exceptions after detecting null.
+    ASSERT_NE(nullptr, msg_loaned);
     ASSERT_TRUE(rosidl_runtime_c__String__assign(&(msg_loaned->string_value), "testing"));
     EXPECT_EQ(
       RCL_RET_OK, rcl_publish_loaned_message(

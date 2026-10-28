@@ -87,7 +87,10 @@ struct FakeTestArgv
   {
     if (this->argv) {
       if (this->argc > 0) {
-        size_t unsigned_argc = this->argc;
+        // (CWE-195): Type Mismatch: Signed to Unsigned
+        // Instead of converting size_t(unsigned type) to signed int implicitly,
+        // convert to same type explicitly and solve the issue related to CWE-195.
+        size_t unsigned_argc = static_cast<size_t>(this->argc);
         for (size_t i = 0; i < unsigned_argc; ++i) {
           allocator.deallocate(this->argv[i], allocator.state);
         }

@@ -380,10 +380,18 @@ rcl_set_ros_time_override(
     }
     time_jump.delta.nanoseconds = time_value - current_time;
     rcl_clock_call_callbacks(clock, &time_jump, true);
-    rcutils_atomic_store(&(storage->current_time), time_value);
+    // (CWE-195): Type Mismatch: Signed to Unsigned
+    // Instead of assigning rcl_time_point_value_t (signed int) to
+    // uint_least64_t (unsigned type), as an invalid value,
+    // convert to same type explicitly and solve the issue related to CWE-195.
+    rcutils_atomic_store(&(storage->current_time), (uint_least64_t)time_value);
     rcl_clock_call_callbacks(clock, &time_jump, false);
   } else {
-    rcutils_atomic_store(&(storage->current_time), time_value);
+    // (CWE-195): Type Mismatch: Signed to Unsigned
+    // Instead of assigning rcl_time_point_value_t (signed int) to
+    // uint_least64_t (unsigned type), as an invalid value,
+    // convert to same type explicitly and solve the issue related to CWE-195.
+    rcutils_atomic_store(&(storage->current_time), (uint_least64_t)time_value);
   }
   return RCL_RET_OK;
 }
