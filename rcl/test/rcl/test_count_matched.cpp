@@ -44,8 +44,11 @@ void check_state(
   size_t expected_publisher_count,
   size_t number_of_tries)
 {
-  size_t subscriber_count = -1;
-  size_t publisher_count = -1;
+  // (CWE-195): Type Mismatch: Negative to Unsigned
+  // Instead of converting signed int to size_t(unsigned type) implicitly,
+  // convert to same type explicitly and solve the issue related to CWE-195.
+  size_t subscriber_count = static_cast<size_t>(-1);
+  size_t publisher_count = static_cast<size_t>(-1);
 
   rcl_ret_t ret;
 

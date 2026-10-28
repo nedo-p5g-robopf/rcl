@@ -137,7 +137,11 @@ rcl_init(
     // Roll over occurred, this is an extremely unlikely occurrence.
     RCL_SET_ERROR_MSG("unique rcl instance ids exhausted");
     // Roll back to try to avoid the next call succeeding, but there's a data race here.
-    rcutils_atomic_store(&__rcl_next_unique_id, -1);
+    // (CWE-195): Type Mismatch: Signed to Unsigned
+    // Instead of assigning -1 (signed int) to
+    // uint_least64_t (unsigned type), as an invalid value,
+    // convert to same type explicitly and solve the issue related to CWE-195.
+    rcutils_atomic_store(&__rcl_next_unique_id, (uint_least64_t)(-1));
     goto fail;
   }
   rcutils_atomic_store((atomic_uint_least64_t *)(&context->instance_id_storage), next_instance_id);

@@ -41,9 +41,12 @@ rcl_get_localhost_only(rmw_localhost_only_t * localhost_only)
       get_env_error_str);
     return RCL_RET_ERROR;
   }
-  *localhost_only = (ros_local_host_env_val != NULL &&
+  // (CWE-195): Type Mismatch: Signed to Unsigned
+  // Instead of converting the conditional (signed int) to enum implicitly,
+  // convert to same type explicitly and solve the issue related to CWE-195.
+  *localhost_only = (rmw_localhost_only_t)((ros_local_host_env_val != NULL &&
     strcmp(
       ros_local_host_env_val,
-      "1") == 0) ? RMW_LOCALHOST_ONLY_ENABLED : RMW_LOCALHOST_ONLY_DISABLED;
+      "1") == 0) ? RMW_LOCALHOST_ONLY_ENABLED : RMW_LOCALHOST_ONLY_DISABLED);
   return RCL_RET_OK;
 }

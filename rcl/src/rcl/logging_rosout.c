@@ -265,8 +265,14 @@ void rcl_logging_rosout_output_handler(
       if (NULL != log_message) {
         log_message->stamp.sec = (int32_t) RCL_NS_TO_S(timestamp);
         log_message->stamp.nanosec = (timestamp % RCL_S_TO_NS(1));
-        log_message->level = severity;
-        log_message->line = (int32_t) location->line_number;
+        // (CWE-195): Type Mismatch: Signed to Unsigned
+        // Instead of assigning signed int to unsigned int implicitly,
+        // convert to same type explicitly and solve the issue related to CWE-195.
+        log_message->level = (uint8_t) severity;
+        // (CWE-195): Type Mismatch: Signed to Unsigned
+        // Instead of assigning signed int to unsigned int implicitly,
+        // convert to same type explicitly and solve the issue related to CWE-195.
+        log_message->line = (uint32_t) location->line_number;
         rosidl_runtime_c__String__assign(&log_message->name, name);
         rosidl_runtime_c__String__assign(&log_message->msg, msg_array.buffer);
         rosidl_runtime_c__String__assign(&log_message->file, location->file_name);

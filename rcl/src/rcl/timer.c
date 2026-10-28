@@ -175,7 +175,10 @@ rcl_timer_init(
     }
   }
   atomic_init(&impl.callback, (uintptr_t)callback);
-  atomic_init(&impl.period, period);
+  // (CWE-195): Type Mismatch: Signed to Unsigned
+  // Instead of assigning signed int to unsigned int implicitly,
+  // convert to same type explicitly and solve the issue related to CWE-195.
+  atomic_init(&impl.period, (uint_least64_t)period);
   atomic_init(&impl.time_credit, 0);
   atomic_init(&impl.last_call_time, now);
   atomic_init(&impl.next_call_time, now + period);
